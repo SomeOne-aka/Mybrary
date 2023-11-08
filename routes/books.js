@@ -49,9 +49,73 @@ router.post("/", async (req, res) => {
 
   try {
     const newBook = await book.save();
-    res.redirect("/books");
+    res.redirect(`/books/${newBook.id}`);
   } catch (error) {
     renderNewPage(res, book, true);
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id).populate("author");
+    console.log(book);
+    res.render("books/show", {
+      book,
+    });
+  } catch (error) {
+    console.log(error);
+    res.redirect("/");
+  }
+});
+
+router.get("/:id/edit", async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id);
+    renderEditPage(res, book);
+  } catch (error) {
+    res.redirect("/");
+  }
+});
+
+router.put("/:id", async (req, res) => {
+  let book;
+
+  try {
+    book = await Book.findById(req.params.id);
+    book.title = req.body.title;
+    book.author = req.body.author;
+    book.publishDate = req.body.publishDate;
+    book.pageCount = req.body.pageCount;
+    book.description = req.body.description;
+
+    saveCover(book, req.body.cover);
+
+    await book.save();
+    res.redirect(`/books/${book.id}`);
+  } catch (error) {
+    if (book != null) {
+      renderEditPage(res, book, true);
+    } else {
+      res.redirect("/");
+    }
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  let book;
+
+  try {
+    book = await Book.findByIdAndDelete(req.params.id);
+    res.redirect("/books");
+  } catch (error) {
+    if (book != null) {
+      res.render("books/show", {
+        book,
+        errorMessage: "Error deleting book",
+      });
+    } else {
+      res.redirect("/");
+    }
   }
 });
 
@@ -75,6 +139,20 @@ function saveCover(book, coverEncoded) {
   if (cover != null && imageMemeTypes.includes(cover.type)) {
     book.coverImage = new Buffer.from(cover.data, "base64");
     book.coverImageType = cover.type;
+  }
+}
+
+async function renderEditPage(res, book, hasError = false) {
+  try {
+    const authors = await Author.find();
+    let params = {
+      authors,
+      book,
+    };
+    if (hasError) params.errorMessage = "Error creating Book";
+    res.render("books/edit", params);
+  } catch (error) {
+    res.redirect("/");
   }
 }
 

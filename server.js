@@ -5,6 +5,7 @@ if (process.env.NODE_ENV !== "production") {
 const express = require("express");
 const app = express();
 const expressLayouts = require("express-ejs-layouts");
+const methodOverride = require("method-override");
 
 const indexRouter = require("./routes/index");
 const authorsRouter = require("./routes/authors");
@@ -15,6 +16,7 @@ app.use(expressLayouts);
 app.set("layout", "layouts/layout");
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: false }));
+app.use(methodOverride("_method"));
 
 const mongoose = require("mongoose");
 mongoose.connect(process.env.DATABASE_URL);
