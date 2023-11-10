@@ -1,0 +1,32 @@
+@import "shared/font.css";
+@import "shared/variables.css";
+@import "shared/header.css";
+@import "shared/buttons.css";
+
+*, *::after, *::before {
+    margin: 0%;
+    padding: 0%;
+    box-sizing: border-box;
+    font-family: "Gotham";
+    color: var(--color-text-light);
+
+}
+
+body {
+    background: linear-gradient(to right, var(--color-background-dark), var(--color-background-light));
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+    margin-bottom: 3rem;
+}
+
+.inner-container {
+    margin: 0 2rem; 
+}
+
+.page-header {
+    font-size: 2rem;
+    font-weight: 500;
+}
